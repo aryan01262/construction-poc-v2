@@ -87,7 +87,7 @@ export const EngineerPanel = () => {
                     <TableCell className="text-sm">W{t.weekNumber}</TableCell>
                     <TableCell className="text-sm">{t.contractor}</TableCell>
                     <TableCell className="text-sm font-medium">{t.trade}</TableCell>
-                    <TableCell className="text-sm">{t.floor}</TableCell>
+                    <TableCell className="text-sm">{t.subActivity}</TableCell>
                     <TableCell className="text-sm">{t.targetQuantity} {t.unit}</TableCell>
                     <TableCell>
                       <Button size="sm" onClick={() => forwardTarget(t.id)} disabled={!canForward} variant={canForward ? 'default' : 'outline'}>
