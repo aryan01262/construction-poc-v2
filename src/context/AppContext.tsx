@@ -85,7 +85,7 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
   }, [updateTarget]);
 
   return (
-    <AppContext.Provider value={{ role, setRole, plan, createPlan, addTask, deleteTask, forwardTarget, logTarget, validateTarget, confirmTarget }}>
+    <AppContext.Provider value={{ role, setRole, plan, createPlan, addTask, deleteTask, addContractor, forwardTarget, logTarget, validateTarget, confirmTarget }}>
       {children}
     </AppContext.Provider>
   );
