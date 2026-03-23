@@ -6,6 +6,7 @@ export interface DailyTarget {
   date: string;
   contractor: string;
   trade: string;
+  subActivity: string;
   zone: string;
   floor: string;
   description: string;
