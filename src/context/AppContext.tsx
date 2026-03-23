@@ -8,6 +8,7 @@ interface AppContextType {
   createPlan: (plan: SixWeekPlan) => void;
   addTask: (task: DailyTarget) => void;
   deleteTask: (taskId: string) => void;
+  addContractor: (name: string) => void;
   forwardTarget: (targetId: string) => void;
   logTarget: (targetId: string, completedQty: number, isDone: boolean, note: string) => void;
   validateTarget: (targetId: string, constraintLog: string) => void;
