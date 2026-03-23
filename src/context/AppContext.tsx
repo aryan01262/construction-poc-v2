@@ -29,7 +29,19 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
   const [role, setRole] = useState<Role>('admin');
   const [plan, setPlan] = useState<SixWeekPlan | null>(() => {
     const saved = localStorage.getItem(STORAGE_KEY);
-    return saved ? JSON.parse(saved) : null;
+    if (!saved) return null;
+    const parsed = JSON.parse(saved);
+    // Migrate old plans missing new fields
+    if (parsed && !parsed.endDate) parsed.endDate = '';
+    if (parsed && !parsed.contractors) parsed.contractors = [];
+    if (parsed?.tasks) {
+      parsed.tasks = parsed.tasks.map((t: any) => ({
+        ...t,
+        floor: t.floor || t.zone || '',
+        grandTarget: t.grandTarget || 0,
+      }));
+    }
+    return parsed;
   });
 
   useEffect(() => {
