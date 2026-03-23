@@ -38,6 +38,7 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
       parsed.tasks = parsed.tasks.map((t: any) => ({
         ...t,
         floor: t.floor || t.zone || '',
+        subActivity: t.subActivity || t.floor || t.zone || '',
         grandTarget: t.grandTarget || 0,
       }));
     }
