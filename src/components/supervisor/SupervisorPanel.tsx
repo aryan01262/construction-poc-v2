@@ -102,7 +102,7 @@ export const SupervisorPanel = () => {
               <TableHeader>
                 <TableRow className="bg-muted/50">
                   <TableHead>Trade</TableHead>
-                  <TableHead>Floor</TableHead>
+                  <TableHead>Sub-Activity</TableHead>
                   <TableHead>Completed</TableHead>
                   <TableHead>Status</TableHead>
                 </TableRow>
