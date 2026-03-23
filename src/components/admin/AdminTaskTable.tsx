@@ -23,7 +23,7 @@ export const AdminTaskTable = () => {
   const [formDate, setFormDate] = useState('');
   const [formContractor, setFormContractor] = useState('');
   const [formTrade, setFormTrade] = useState('');
-  const [formFloor, setFormFloor] = useState('');
+  const [formSubActivity, setFormSubActivity] = useState('');
   const [formDescription, setFormDescription] = useState('');
   const [formQty, setFormQty] = useState('');
   const [formGrandTarget, setFormGrandTarget] = useState('');
@@ -42,16 +42,17 @@ export const AdminTaskTable = () => {
   const validatedTasks = plan.tasks.filter(t => t.status === 'validated');
 
   const handleSave = () => {
-    if (!formDate || !formContractor || !formTrade || !formFloor) return;
+    if (!formDate || !formContractor || !formTrade || !formSubActivity) return;
     const task: DailyTarget = {
       id: crypto.randomUUID(),
       weekNumber: Number(formWeek),
       date: formDate,
       contractor: formContractor,
       trade: formTrade,
-      zone: formFloor,
-      floor: formFloor,
-      description: formDescription || `${formTrade} work on ${formFloor}`,
+      subActivity: formSubActivity,
+      zone: formSubActivity,
+      floor: formSubActivity,
+      description: formDescription || `${formTrade} — ${formSubActivity}`,
       targetQuantity: Number(formQty) || 0,
       grandTarget: Number(formGrandTarget) || 0,
       unit: formUnit || 'units',
@@ -63,7 +64,7 @@ export const AdminTaskTable = () => {
   };
 
   const resetForm = () => {
-    setFormDate(''); setFormContractor(''); setFormTrade(''); setFormFloor('');
+    setFormDate(''); setFormContractor(''); setFormTrade(''); setFormSubActivity('');
     setFormDescription(''); setFormQty(''); setFormUnit(''); setFormGrandTarget('');
   };
 
@@ -87,7 +88,7 @@ export const AdminTaskTable = () => {
         <div>
           <h2 className="text-lg font-semibold text-foreground">{plan.name}</h2>
           <p className="text-sm text-muted-foreground">
-            {new Date(plan.startDate).toLocaleDateString()} — {new Date(plan.endDate).toLocaleDateString()} · {plan.tasks.length} tasks
+            {new Date(plan.startDate).toLocaleDateString()} — {plan.endDate ? new Date(plan.endDate).toLocaleDateString() : ''} · {plan.tasks.length} tasks
           </p>
         </div>
         <Button variant="outline" size="sm" onClick={handleReset}>
@@ -103,7 +104,7 @@ export const AdminTaskTable = () => {
             {validatedTasks.map(t => (
               <div key={t.id} className="flex items-center justify-between bg-card rounded-md border p-3 text-sm">
                 <div>
-                  <span className="font-medium">{t.trade}</span> — {t.floor} · {t.completedQuantity}/{t.targetQuantity} {t.unit}
+                  <span className="font-medium">{t.trade}</span> — {t.subActivity} · {t.completedQuantity}/{t.targetQuantity} {t.unit}
                   {t.constraintLog && <p className="text-xs text-muted-foreground mt-0.5">Constraint: {t.constraintLog}</p>}
                 </div>
                 <Button size="sm" onClick={() => confirmTarget(t.id)}>
@@ -142,17 +143,17 @@ export const AdminTaskTable = () => {
       <div className="bg-card rounded-lg border overflow-x-auto">
         <Table>
           <TableHeader>
-            <TableRow className="bg-muted/50">
-              <TableHead className="w-[50px]">ID</TableHead>
-              <TableHead>Date</TableHead>
-              <TableHead>Week</TableHead>
-              <TableHead>Contractor</TableHead>
-              <TableHead>Trade</TableHead>
-              <TableHead>Floor</TableHead>
-              <TableHead>Qty</TableHead>
-              <TableHead>Grand Target</TableHead>
-              <TableHead>Status</TableHead>
-              <TableHead className="w-[80px]">Actions</TableHead>
+            <TableRow className="bg-primary/10">
+              <TableHead className="w-[50px] font-semibold">ID</TableHead>
+              <TableHead className="font-semibold">Date</TableHead>
+              <TableHead className="font-semibold">Week</TableHead>
+              <TableHead className="font-semibold">Trade Activity</TableHead>
+              <TableHead className="font-semibold">Sub-Activity</TableHead>
+              <TableHead className="font-semibold">Responsible Party</TableHead>
+              <TableHead className="font-semibold">Qty</TableHead>
+              <TableHead className="font-semibold">Grand Target</TableHead>
+              <TableHead className="font-semibold">Status</TableHead>
+              <TableHead className="w-[80px] font-semibold">Actions</TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>
@@ -168,9 +169,9 @@ export const AdminTaskTable = () => {
                 <TableCell className="font-mono text-xs text-muted-foreground">{i + 1}</TableCell>
                 <TableCell className="text-sm">{t.date}</TableCell>
                 <TableCell className="text-sm">W{t.weekNumber}</TableCell>
-                <TableCell className="text-sm">{t.contractor}</TableCell>
                 <TableCell className="text-sm font-medium">{t.trade}</TableCell>
-                <TableCell className="text-sm">{t.floor}</TableCell>
+                <TableCell className="text-sm">{t.subActivity}</TableCell>
+                <TableCell className="text-sm">{t.contractor}</TableCell>
                 <TableCell className="text-sm">{t.targetQuantity} {t.unit}</TableCell>
                 <TableCell className="text-sm">{t.grandTarget} {t.unit}</TableCell>
                 <TableCell><StatusBadge status={t.status} /></TableCell>
@@ -194,7 +195,7 @@ export const AdminTaskTable = () => {
           <div className="space-y-3">
             <div>
               <Label>Contractor Name</Label>
-              <Input value={newContractor} onChange={e => setNewContractor(e.target.value)} placeholder="e.g. ABC Construction" className="mt-1" />
+              <Input value={newContractor} onChange={e => setNewContractor(e.target.value)} placeholder="e.g. ADHIRAJ CONSTRUCTION" className="mt-1" />
             </div>
             {plan.contractors.length > 0 && (
               <div>
@@ -236,7 +237,15 @@ export const AdminTaskTable = () => {
               </div>
             </div>
             <div>
-              <Label>Contractor</Label>
+              <Label>Trade Activity</Label>
+              <Input value={formTrade} onChange={e => setFormTrade(e.target.value)} placeholder="e.g. RCC (SHUTTERING, REINFORCEMENT, CASTING)" className="mt-1" />
+            </div>
+            <div>
+              <Label>Sub-Activity (Floors)</Label>
+              <Input value={formSubActivity} onChange={e => setFormSubActivity(e.target.value)} placeholder="e.g. 10th, 11th, 12th, 13th floor" className="mt-1" />
+            </div>
+            <div>
+              <Label>Responsible Party (Contractor)</Label>
               {plan.contractors.length > 0 ? (
                 <Select value={formContractor} onValueChange={setFormContractor}>
                   <SelectTrigger className="mt-1"><SelectValue placeholder="Select contractor" /></SelectTrigger>
@@ -247,20 +256,12 @@ export const AdminTaskTable = () => {
                   </SelectContent>
                 </Select>
               ) : (
-                <p className="text-xs text-muted-foreground mt-1">No contractors added. Use "+ Contractor" button first.</p>
+                <p className="text-xs text-muted-foreground mt-1">No contractors added yet. Use "+ Contractor" button first.</p>
               )}
             </div>
             <div>
-              <Label>Trade Activity</Label>
-              <Input value={formTrade} onChange={e => setFormTrade(e.target.value)} placeholder="e.g. Plumbing, Electrical, Masonry" className="mt-1" />
-            </div>
-            <div>
-              <Label>Floor</Label>
-              <Input value={formFloor} onChange={e => setFormFloor(e.target.value)} placeholder="e.g. Floor 1, Basement, Terrace" className="mt-1" />
-            </div>
-            <div>
               <Label>Description (optional)</Label>
-              <Input value={formDescription} onChange={e => setFormDescription(e.target.value)} placeholder="Task details" className="mt-1" />
+              <Input value={formDescription} onChange={e => setFormDescription(e.target.value)} placeholder="Additional details" className="mt-1" />
             </div>
             <div className="grid grid-cols-3 gap-3">
               <div>
@@ -277,7 +278,7 @@ export const AdminTaskTable = () => {
               </div>
             </div>
             <div className="flex gap-2 pt-2">
-              <Button onClick={handleSave} disabled={!formDate || !formContractor || !formTrade || !formFloor} className="flex-1">
+              <Button onClick={handleSave} disabled={!formDate || !formContractor || !formTrade || !formSubActivity} className="flex-1">
                 Initiate Planned Activity
               </Button>
               <Button variant="outline" onClick={() => { setShowCreate(false); resetForm(); }}>Cancel</Button>
