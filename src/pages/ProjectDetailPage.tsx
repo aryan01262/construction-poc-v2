@@ -96,6 +96,7 @@ const ProjectDetailPage = () => {
         sixWeekPlanId: swp.id,
         taskId: wp.taskId,
         tradeActivity: wp.tradeActivity,
+        trade: wp.trade,
         weekUnit: wp.unit,
         weekEstQty: wp.estimatedQuantity,
         planName: swp.name,
@@ -206,6 +207,7 @@ const ProjectDetailPage = () => {
                         <TableRow className="bg-muted/30">
                           <TableHead className="text-xs">Category</TableHead>
                           <TableHead className="text-xs">Contractor</TableHead>
+                          <TableHead className="text-xs">Trade</TableHead>
                           <TableHead className="text-xs">Trade Activity</TableHead>
                           <TableHead className="text-xs">Unit</TableHead>
                           <TableHead className="text-xs">Est. Qty</TableHead>
@@ -217,6 +219,7 @@ const ProjectDetailPage = () => {
                           <TableRow key={act.id}>
                             <TableCell className="text-xs">{act.category}</TableCell>
                             <TableCell className="text-xs">{getContractorName(act.contractorId)}</TableCell>
+                             <TableCell className="text-xs">{act.trade}</TableCell>
                             <TableCell className="text-xs">{act.tradeActivity}</TableCell>
                             <TableCell className="text-xs">{act.unit}</TableCell>
                             <TableCell className="text-xs">{act.estimatedQuantity}</TableCell>
@@ -497,6 +500,7 @@ const ProjectDetailPage = () => {
                         <TableHead className="text-xs">Category</TableHead>
                         <TableHead className="text-xs">Contractor</TableHead>
                         <TableHead className="text-xs">Trade</TableHead>
+                        <TableHead className="text-xs">Trade Activity</TableHead>
                         <TableHead className="text-xs">Unit</TableHead>
                         <TableHead className="text-xs">Qty</TableHead>
                         <TableHead className="text-xs">Floor</TableHead>
@@ -509,6 +513,7 @@ const ProjectDetailPage = () => {
                           <TableCell className="text-xs font-mono">{idx + 1}</TableCell>
                           <TableCell className="text-xs">{act.category || '—'}</TableCell>
                           <TableCell className="text-xs">{act.contractorId ? getContractorName(act.contractorId) : '—'}</TableCell>
+                          <TableCell className="text-xs">{act.trade || '—'}</TableCell>
                           <TableCell className="text-xs">{act.tradeActivity || '—'}</TableCell>
                           <TableCell className="text-xs">{act.unit || '—'}</TableCell>
                           <TableCell className="text-xs">{act.estimatedQuantity || '—'}</TableCell>
@@ -553,12 +558,24 @@ const ProjectDetailPage = () => {
                     </div>
                   </div>
                   <div>
-                    <Label className="text-xs">Trade Activity</Label>
-                    <Select value={planActivities[editingActivityIdx].tradeActivity} onValueChange={v => updateActivity(editingActivityIdx, 'tradeActivity', v)}>
+                    <Label className="text-xs">Trade</Label>
+                    <Select value={planActivities[editingActivityIdx].trade} onValueChange={v => updateActivity(editingActivityIdx, 'trade', v)}>
                       <SelectTrigger className="mt-1"><SelectValue placeholder="Select" /></SelectTrigger>
                       <SelectContent>{TRADE_ACTIVITIES.map(t => <SelectItem key={t} value={t}>{t}</SelectItem>)}</SelectContent>
                     </Select>
                   </div>
+
+               <div>
+  <Label className="text-xs">Trade Activity</Label>
+  <Input
+    className="mt-1"
+    placeholder="Enter Trade Activity"
+    value={planActivities[editingActivityIdx].tradeActivity || ""}
+    onChange={(e) =>
+      updateActivity(editingActivityIdx, "tradeActivity", e.target.value)
+    }
+  />
+</div>
                   <div className="grid grid-cols-3 gap-3">
                     <div>
                       <Label className="text-xs">Unit</Label>
