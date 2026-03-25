@@ -72,26 +72,46 @@ export interface WeeklyPlan {
 
 // Dummy data for dropdowns
 export const CATEGORIES = [
-  'Structural', 'Finishing', 'MEP', 'Civil', 'Interior', 'Exterior', 'Landscaping', 'Waterproofing'
+  'Detailed Design & Approvals','Site Preparation','Structural Works', 'Structural & Exterior Systems', 'MEP Core Installation', 'Interior Finishing', 'Interior Construction', 'Exterior development', 'Fixtures & Equipment', 'Testing & Commissioning', 'Handover & Closeout', 'General/Cross-Trade Activities'
 ];
 
-export const TRADE_ACTIVITIES = [
-  'RCC (Shuttering, Reinforcement, Casting)',
-  'Blockwork / Masonry',
-  'Plastering (Internal & External)',
-  'Plumbing & Drainage',
-  'Electrical Wiring & Conduit',
-  'HVAC Ducting & Installation',
-  'Waterproofing & Insulation',
-  'Tiling & Flooring',
-  'Painting & Coating',
-  'Glazing & Aluminium Works',
-  'Fire Fighting Installation',
-  'False Ceiling & Partitions',
+export const TRADE_ACTIVITIES =[
+  "Trade",
+  "Surveying",
+  "Earthwork",
+  "Piling / Foundation",
+  "RCC / Structural",
+  "Structural Steel",
+  "Rebar",
+  "Formwork",
+  "Masonry",
+  "Plaster",
+  "Waterproofing",
+  "Flooring / Tiling",
+  "Stone Works",
+  "Painting",
+  "Carpentry",
+  "Doors / Windows",
+  "Aluminium / Glazing",
+  "Façade / Cladding",
+  "False Ceiling",
+  "Drywall / Partitions",
+  "Electrical",
+  "Plumbing",
+  "HVAC",
+  "Firefighting",
+  "ELV / ICT",
+  "Lift / Escalator",
+  "External Development",
+  "Road / Paving",
+  "Landscaping",
+  "Testing & Commissioning",
+  "Equipment / Machinery",
+  "General Site Work"
 ];
 
 export const UNITS = [
-  'sq.m', 'cu.m', 'rmt', 'nos', 'kg', 'lots', 'sqft', 'bags', 'trips'
+  'FLAT', 'SQM', 'MT', 'CUBIC'
 ];
 
 export const FLOOR_UNITS = [
@@ -103,9 +123,21 @@ export const FLOOR_UNITS = [
 ];
 
 export const CONSTRAINTS = [
-  'Material Shortage', 'Manpower Shortage', 'Drawing Pending',
-  'Approval Pending', 'Weather Delay', 'Access Issue',
-  'Rework Required', 'Client Change', 'Safety Concern', 'No Constraint',
+  'Material Shortage', 'Material Arrived Late', 'Faulty Material, wrong specs','Material Unavailability due to vendor/transporter',
+  'Labour Shortage', 'Insufficient skill of workmen', 'Low Productivity', 'Execution Failure', 'Equipment Breakdown', 'Low output of equipment', 
+  "Lack of sufficient drawings / specifications for work", "Design error found while executing", "Delay in decisions by Client / Consultant / Govt. Authorities",
+   "Lack of Space Planning", "Failure in coordination of shared resources (equipment, storage, water, power, scaffolding) (available at project site, but not available for the work spot)",
+  "Failure in coordination of different trades of workmen (improper hand-offs)", "Inspection / permission required",
+  "Change in priority of work",
+  "Excessive work planned",
+  "Wrong sequencing of works","Pre-requisite work",
+  "Consequential Delay - delay due to WIP or backlog",
+  "Emergencies",
+  "Accidents",
+  "Weather Conditions (Rain, Extreme Heat or Cold)",
+  "Visits (Management, Client, Government Officials, Outsiders)",
+  "Power Breakdown",
+  "Unforeseen Site Conditions (Underground services, structures, leakage from existing services, etc.)"
 ];
 
 export const DEFAULT_CONTRACTORS: Contractor[] = [
