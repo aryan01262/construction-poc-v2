@@ -102,7 +102,7 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
     <AppContext.Provider value={{
       role, setRole, contractors, addContractor,
       projects, createProject, activeProjectId, setActiveProjectId,
-      addSixWeekPlan, addWeeklyPlan, assignToEngineer,
+      addSixWeekPlan, updateSixWeekPlanActivities, addWeeklyPlan, assignToEngineer,
       addDailyPlan, forwardDailyToSupervisor, logDailyTarget, submitDailyTarget, confirmDailyTarget,
     }}>
       {children}
