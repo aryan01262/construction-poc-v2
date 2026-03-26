@@ -346,7 +346,7 @@ const ProjectDetailPage = () => {
     </DropdownMenuContent>
   </DropdownMenu>
 </div>
-                        
+               
                       </div>
                       <div className="flex gap-2 justify-end">
                         <Button size="sm" variant="outline" onClick={() => { setEditingId(null); setEditData(null); }}>Cancel</Button>
