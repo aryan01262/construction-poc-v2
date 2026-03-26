@@ -172,7 +172,7 @@ const ProjectDetailPage = () => {
   // Get the current six-week plan for the sub-week dialog
   const currentSwpForWeekly = showCreateWeekly ? project.sixWeekPlans.find(s => s.id === showCreateWeekly) : null;
   const selectedActivity = currentSwpForWeekly?.activities.find(a => a.id === wpActivityId);
-
+    console.log(selectedActivity)
   return (
     <div>
       <div className="flex items-center gap-2 mb-4">
@@ -213,7 +213,7 @@ const ProjectDetailPage = () => {
                     <Table>
                       <TableHeader>
                         <TableRow className="bg-muted/30">
-                          <TableHead className="text-xs">#</TableHead>
+                          <TableHead className="text-xs">Id</TableHead>
                           <TableHead className="text-xs">Category</TableHead>
                           <TableHead className="text-xs">Contractor</TableHead>
                           <TableHead className="text-xs">Trade</TableHead>
@@ -227,7 +227,7 @@ const ProjectDetailPage = () => {
                       <TableBody>
                         {swp.activities.map((act, idx) => (
                           <TableRow key={act.id} className={editingId === act.id ? 'bg-primary/5' : ''}>
-                            <TableCell className="text-xs font-mono">{idx + 1}</TableCell>
+                            <TableCell className="text-xs font-mono">{act.id}</TableCell>
                             <TableCell className="text-xs">{act.category}</TableCell>
                             <TableCell className="text-xs">{getContractorName(act.contractorId)}</TableCell>
                             <TableCell className="text-xs">{act.trade}</TableCell>
@@ -708,7 +708,20 @@ const ProjectDetailPage = () => {
             {/* Step 1: Select Activity */}
             <div>
               <Label>Select Activity</Label>
-              <Select value={wpActivityId} onValueChange={setWpActivityId}>
+            <Select
+  value={wpActivityId}
+  onValueChange={(val) => {
+    setWpActivityId(val);
+
+    const act = currentSwpForWeekly?.activities.find(a => a.id === val);
+
+    if (act) {
+      setWpUnit(act.unit);          // ✅ Prefill Unit
+      setWpFloor(act.floorUnits);  // ✅ Prefill Floor Units
+      setWpEstQty("");             // optional reset quantity
+    }
+  }}
+>
                 <SelectTrigger className="mt-1"><SelectValue placeholder="Choose an activity" /></SelectTrigger>
                 <SelectContent>
                   {currentSwpForWeekly?.activities.map(act => (
@@ -725,10 +738,16 @@ const ProjectDetailPage = () => {
               <div className="rounded-lg border bg-muted/20 p-3 space-y-1">
                 <p className="text-xs font-semibold text-muted-foreground">Activity Details</p>
                 <div className="grid grid-cols-2 gap-x-4 gap-y-1 text-xs">
+                  <span className="text-muted-foreground">Activity ID:</span><span>{selectedActivity.id}</span>
                   <span className="text-muted-foreground">Category:</span><span>{selectedActivity.category}</span>
                   <span className="text-muted-foreground">Contractor:</span><span>{getContractorName(selectedActivity.contractorId)}</span>
                   <span className="text-muted-foreground">Trade:</span><span>{selectedActivity.trade}</span>
                   <span className="text-muted-foreground">Trade Activity:</span><span>{selectedActivity.tradeActivity}</span>
+                   <span className="text-muted-foreground">Estimated Quantity:</span><span>{selectedActivity.estimatedQuantity}</span>
+                    <span className="text-muted-foreground">Units:</span><span>{selectedActivity.unit}</span>
+                    <span className="text-muted-foreground">Floor Unit:</span><span>{selectedActivity.floorUnits}</span>
+                  
+
                 </div>
               </div>
             )}
@@ -744,18 +763,33 @@ const ProjectDetailPage = () => {
             <div className="grid grid-cols-3 gap-3">
               <div>
                 <Label>Unit</Label>
-                <Select value={wpUnit} onValueChange={setWpUnit}>
+                <Select value={wpUnit} disabled>
                   <SelectTrigger className="mt-1"><SelectValue placeholder="Unit" /></SelectTrigger>
                   <SelectContent>{UNITS.map(u => <SelectItem key={u} value={u}>{u}</SelectItem>)}</SelectContent>
                 </Select>
               </div>
               <div>
                 <Label>Est. Quantity</Label>
-                <Input type="number" value={wpEstQty} onChange={e => setWpEstQty(e.target.value)} placeholder="100" className="mt-1" />
+                <Input
+  type="number"
+  value={wpEstQty}
+  onChange={e => {
+    const value = Number(e.target.value);
+
+    if (selectedActivity && value > selectedActivity.estimatedQuantity) {
+      alert(`Max allowed quantity is ${selectedActivity.estimatedQuantity}`);
+      return;
+    }
+
+    setWpEstQty(e.target.value);
+  }}
+  placeholder="100"
+  className="mt-1"
+/>
               </div>
               <div>
                 <Label>Floor Units</Label>
-                <Select value={wpFloor} onValueChange={setWpFloor}>
+                <Select value={wpFloor} disabled>
                   <SelectTrigger className="mt-1"><SelectValue placeholder="Floor" /></SelectTrigger>
                   <SelectContent>{FLOOR_UNITS.map(f => <SelectItem key={f} value={f}>{f}</SelectItem>)}</SelectContent>
                 </Select>
