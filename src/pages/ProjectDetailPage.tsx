@@ -55,9 +55,7 @@ const ProjectDetailPage = () => {
   const [editingActivityIdx, setEditingActivityIdx] = useState<number | null>(0);
 
   // Weekly plan form
-  const [wpCategory, setWpCategory] = useState('');
-  const [wpContractor, setWpContractor] = useState('');
-  const [wpTrade, setWpTrade] = useState('');
+  const [wpActivityId, setWpActivityId] = useState('');
   const [wpUnit, setWpUnit] = useState('');
   const [wpEstQty, setWpEstQty] = useState('');
   const [wpFloor, setWpFloor] = useState('');
