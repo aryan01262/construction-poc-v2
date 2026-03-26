@@ -23,6 +23,7 @@ const emptyActivity = (): PlanActivity => ({
   id: crypto.randomUUID(),
   category: '',
   contractorId: '',
+  trade: '',
   tradeActivity: '',
   unit: '',
   estimatedQuantity: 0,
