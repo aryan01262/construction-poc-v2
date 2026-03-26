@@ -35,7 +35,7 @@ const ProjectDetailPage = () => {
   const navigate = useNavigate();
   const {
     projects, contractors, role,
-    addSixWeekPlan, addWeeklyPlan, assignToEngineer,
+    addSixWeekPlan, updateSixWeekPlanActivities, addWeeklyPlan, assignToEngineer,
     addDailyPlan, forwardDailyToSupervisor, logDailyTarget, submitDailyTarget, confirmDailyTarget,
   } = useAppContext();
 
