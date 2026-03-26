@@ -54,6 +54,12 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
     setProjects(prev => prev.map(p => p.id === projectId ? { ...p, sixWeekPlans: [...p.sixWeekPlans, plan] } : p));
   }, []);
 
+  const updateSixWeekPlanActivities = useCallback((projectId: string, sixWeekPlanId: string, activities: PlanActivity[]) => {
+    setProjects(prev => prev.map(p => p.id === projectId ? {
+      ...p, sixWeekPlans: p.sixWeekPlans.map(swp => swp.id === sixWeekPlanId ? { ...swp, activities } : swp)
+    } : p));
+  }, []);
+
   const addWeeklyPlan = useCallback((projectId: string, sixWeekPlanId: string, wp: WeeklyPlan) => {
     setProjects(prev => prev.map(p => p.id === projectId ? {
       ...p, sixWeekPlans: p.sixWeekPlans.map(swp => swp.id === sixWeekPlanId ? { ...swp, weeklyPlans: [...swp.weeklyPlans, wp] } : swp)
