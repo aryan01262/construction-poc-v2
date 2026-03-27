@@ -74,6 +74,7 @@ const ProjectDetailPage = () => {
   // Supervisor log
   const [logQty, setLogQty] = useState('');
   const [logNote, setLogNote] = useState('');
+  const [rovComment, setRovComment] = useState('');
 
   // Inline editing for activities table
   const [editingId, setEditingId] = useState<string | null>(null);
@@ -511,7 +512,7 @@ const maxAllowedQty = Number(selectedWp?.estimatedQuantity || 0);
                                 <TableHead className="text-xs font-semibold">Actual Qty</TableHead>
                                 <TableHead className="text-xs font-semibold">Floor</TableHead>
                                 <TableHead className="text-xs font-semibold">Constraint</TableHead>
-                                <TableHead className="text-xs font-semibold">Note</TableHead>
+                                <TableHead className="text-xs font-semibold">ROV Comments</TableHead>
                                 <TableHead className="text-xs font-semibold">Status</TableHead>
                                 <TableHead className="text-xs font-semibold">Actions</TableHead>
                               </TableRow>
@@ -580,8 +581,8 @@ const maxAllowedQty = Number(selectedWp?.estimatedQuantity || 0);
                     <TableHead className="font-semibold">Target</TableHead>
                     <TableHead className="font-semibold">Floor</TableHead>
                     <TableHead className="font-semibold">Constraint</TableHead>
-                    <TableHead className="font-semibold">Status</TableHead>
-                    <TableHead className="font-semibold">Actions</TableHead>
+                    {/* <TableHead className="font-semibold">Status</TableHead> */}
+                    <TableHead className="font-semibold w-[350px]">Actions</TableHead>
                   </TableRow>
                 </TableHeader>
                 <TableBody>
@@ -594,13 +595,19 @@ const maxAllowedQty = Number(selectedWp?.estimatedQuantity || 0);
                       <TableCell className="text-sm">{dp.plannedQuantity} {dp.weekUnit}</TableCell>
                       <TableCell className="text-xs">{dp.floorUnits}</TableCell>
                       <TableCell className="text-xs">{dp.constraint || '—'}</TableCell>
-                      <TableCell><StatusBadge status={dp.status} /></TableCell>
+                      {/* <TableCell><StatusBadge status={dp.status} /></TableCell> */}
                       <TableCell>
                         {dp.status === 'forwarded' && (
-                          <div className="flex items-center gap-1">
-                            <Input type="number" placeholder="Done qty" value={logQty} onChange={e => setLogQty(e.target.value)} className="h-7 w-16 text-xs" />
-                            <Input placeholder="Note" value={logNote} onChange={e => setLogNote(e.target.value)} className="h-7 w-20 text-xs" />
-                            <Button size="sm" onClick={() => { logDailyTarget(project.id, dp.sixWeekPlanId, dp.weeklyPlanId, dp.id, Number(logQty), true, logNote); setLogQty(''); setLogNote(''); }}>
+                          <div className="flex items-center gap-1 w-[350px] justify-between">
+                            <Input type="number" placeholder="Done qty" value={logQty} onChange={e => setLogQty(e.target.value)} className="h-7 w-[100px] text-xs" />
+                            {/* <Input placeholder="Note" value={logNote} onChange={e => setLogNote(e.target.value)} className="h-7 w-[200px] text-xs" /> */}
+                            <div>
+              <Select value={rovComment} onValueChange={setRovComment}>
+                <SelectTrigger className="mt-1"><SelectValue placeholder="Select ROV Comment" /></SelectTrigger>
+                <SelectContent>{CONSTRAINTS.map(c => <SelectItem key={c} value={c}>{c}</SelectItem>)}</SelectContent>
+              </Select>
+            </div>
+                            <Button size="sm" onClick={() => { logDailyTarget(project.id, dp.sixWeekPlanId, dp.weeklyPlanId, dp.id, Number(logQty), true, rovComment); setLogQty(''); setRovComment(''); }}>
                               Log
                             </Button>
                           </div>
