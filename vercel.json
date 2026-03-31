@@ -1,4 +1,6 @@
 {
+  "installCommand": "apt-get install -y libatomic1 && npm install",
+  "buildCommand": "npm run build",
   "rewrites": [
     { "source": "/(.*)", "destination": "/" }
   ]
