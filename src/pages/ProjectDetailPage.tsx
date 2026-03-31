@@ -37,7 +37,7 @@ const ProjectDetailPage = () => {
   const {
     projects, contractors, role,
     addSixWeekPlan, updateSixWeekPlanActivities, addWeeklyPlan, assignToEngineer,
-    addDailyPlan, forwardDailyToSupervisor, logDailyTarget, submitDailyTarget, confirmDailyTarget,
+    addDailyPlan, forwardDailyToSupervisor, logDailyTarget, submitDailyTarget, confirmDailyTarget, updateActivity2, updateWeeklyPlanField
   } = useAppContext();
 
   const project = projects.find(p => p.id === projectId);
@@ -142,36 +142,140 @@ const engineerTickets = tickets.filter(t => t.assignedTo === 'engineer');
     setPlanName(''); setPlanStartDate(undefined); setPlanActivities([emptyActivity()]); setEditingActivityIdx(0);
   };
 
-  const handleCreateWeekly = (sixWeekPlanId: string) => {
-    const swp = project.sixWeekPlans.find(s => s.id === sixWeekPlanId);
-    if (!swp || !wpActivityId) return;
-    const activity = swp.activities.find(a => a.id === wpActivityId);
-    if (!activity) return;
-    const existingCount = swp.weeklyPlans.length;
-    const wp: WeeklyPlan = {
-      id: crypto.randomUUID(), sixWeekPlanId, weekNumber: Number(wpWeek),
-      taskId: `T-${String(existingCount + 1).padStart(3, '0')}`,
-      category: activity.category, contractorId: activity.contractorId, tradeActivity: activity.tradeActivity,
-      unit: wpUnit || activity.unit, estimatedQuantity: Number(wpEstQty) || 0, floorUnits: wpFloor || activity.floorUnits,
-      constraint: wpConstraint, status: 'pending', assignedToEngineer: false, dailyPlans: [],
-    };
-    addWeeklyPlan(project.id, sixWeekPlanId, wp);
-    setShowCreateWeekly(null);
-    setWpActivityId(''); setWpUnit(''); setWpEstQty(''); setWpFloor(''); setWpConstraint(''); setWpWeek('1');
+  // const handleCreateWeekly = (sixWeekPlanId: string) => {
+  //   const swp = project.sixWeekPlans.find(s => s.id === sixWeekPlanId);
+  //   if (!swp || !wpActivityId) return;
+  //   const activity = swp.activities.find(a => a.id === wpActivityId);
+  //   if (!activity) return;
+  //   const existingCount = swp.weeklyPlans.length;
+  //   const wp: WeeklyPlan = {
+  //     id: crypto.randomUUID(), sixWeekPlanId, weekNumber: Number(wpWeek),
+  //     taskId: `T-${String(existingCount + 1).padStart(3, '0')}`,
+  //     category: activity.category, contractorId: activity.contractorId, tradeActivity: activity.tradeActivity,
+  //     unit: wpUnit || activity.unit, estimatedQuantity: Number(wpEstQty) || 0, floorUnits: wpFloor || activity.floorUnits,
+  //     constraint: wpConstraint, status: 'pending', assignedToEngineer: false, dailyPlans: [],
+  //   };
+  //   addWeeklyPlan(project.id, sixWeekPlanId, wp);
+  //   setShowCreateWeekly(null);
+  //   setWpActivityId(''); setWpUnit(''); setWpEstQty(''); setWpFloor([]); setWpConstraint(''); setWpWeek('1');
+  // };
+
+  
+
+const handleCreateWeekly = (sixWeekPlanId: string) => {
+  const swp = project.sixWeekPlans.find(s => s.id === sixWeekPlanId);
+  if (!swp || !wpActivityId) return;
+
+  const activity = swp.activities.find(a => a.id === wpActivityId);
+  if (!activity) return;
+
+  const qtyToAssign = Number(wpEstQty) || 0;
+
+
+  // Use persisted remainingQuantity, fallback to estimatedQuantity for old data
+  const currentRemaining = activity.remainingQuantity ?? activity.estimatedQuantity;
+
+if (qtyToAssign <= 0) {
+  alert('Quantity must be greater than 0');
+  return;
+}
+
+if (qtyToAssign > currentRemaining) {
+  alert(`Max allowed quantity is ${currentRemaining}. Remaining: ${currentRemaining}`);
+  return;
+}
+
+  const existingCount = swp.weeklyPlans.length;
+
+  const wp: WeeklyPlan = {
+    id: crypto.randomUUID(),
+    sixWeekPlanId,
+    weekNumber: Number(wpWeek),
+    taskId: `T-${String(existingCount + 1).padStart(3, '0')}`,
+    category: activity.category,
+    contractorId: activity.contractorId,
+    tradeActivity: activity.tradeActivity,
+    unit: wpUnit || activity.unit,
+    estimatedQuantity: qtyToAssign,
+    remainingQuantity: qtyToAssign,
+    floorUnits: wpFloor || activity.floorUnits,
+    constraint: wpConstraint,
+    status: 'pending',
+    assignedToEngineer: false,
+    dailyPlans: [],
   };
 
-  const handleCreateDaily = () => {
-    if (!showCreateDaily || !dpDate || !dpQty) return;
-    const daily: DailyPlan = {
-      id: crypto.randomUUID(), weeklyPlanId: showCreateDaily.wpId,
-      dayNumber: Number(dpDay), date: dpDate,
-      plannedQuantity: Number(dpQty), unit: dpUnits, constraint: dpConstraint,
-      floorUnits: dpFloor, engineerNote: dpNote, status: 'pending',
-    };
-    addDailyPlan(project.id, showCreateDaily.swpId, showCreateDaily.wpId, daily);
-    setDpDate(''); setDpQty(''); setDpConstraint(''); setDpFloor([]); setDpNote(''); setDpDay('1'); setDpUnits('')
-    setShowCreateDaily(null);
+  addWeeklyPlan(project.id, sixWeekPlanId, wp);
+
+  // ✅ Persist the new remaining quantity back to the activity
+updateActivity2(project.id, sixWeekPlanId, wpActivityId, {
+    remainingQuantity: currentRemaining - qtyToAssign,
+  });
+
+  setShowCreateWeekly(null);
+  setWpActivityId(''); setWpUnit(''); setWpEstQty(''); setWpFloor([]); setWpConstraint(''); setWpWeek('1');
+};
+console.log()
+  // const handleCreateDaily = () => {
+  //   if (!showCreateDaily || !dpDate || !dpQty) return;
+  //   const daily: DailyPlan = {
+  //     id: crypto.randomUUID(), weeklyPlanId: showCreateDaily.wpId,
+  //     dayNumber: Number(dpDay), date: dpDate,
+  //     plannedQuantity: Number(dpQty), unit: dpUnits, constraint: dpConstraint,
+  //     floorUnits: dpFloor, engineerNote: dpNote, status: 'pending',
+  //   };
+  //   addDailyPlan(project.id, showCreateDaily.swpId, showCreateDaily.wpId, daily);
+  //   setDpDate(''); setDpQty(''); setDpConstraint(''); setDpFloor([]); setDpNote(''); setDpDay('1'); setDpUnits('')
+  //   setShowCreateDaily(null);
+  // };
+
+const handleCreateDaily = () => {
+  if (!showCreateDaily || !dpDate || !dpQty) return;
+
+  const swp = project.sixWeekPlans.find(s => s.id === showCreateDaily.swpId);
+  const wp = swp?.weeklyPlans.find(w => w.id === showCreateDaily.wpId);
+  if (!wp) return;
+
+  const qtyToAssign = Number(dpQty);
+
+  // ✅ First-time fallback: if remainingQuantity not yet set, use estimatedQuantity
+  const currentRemaining = wp.remainingQuantity ?? wp.estimatedQuantity;
+
+  if (qtyToAssign <= 0) {
+    alert('Quantity must be greater than 0');
+    return;
+  }
+
+  if (qtyToAssign > currentRemaining) {
+    alert(`Max allowed quantity is ${currentRemaining}`);
+    return;
+  }
+
+  const daily: DailyPlan = {
+    id: crypto.randomUUID(),
+    weeklyPlanId: showCreateDaily.wpId,
+    dayNumber: Number(dpDay),
+    date: dpDate,
+    plannedQuantity: qtyToAssign,
+    unit: dpUnits,
+    constraint: dpConstraint,
+    floorUnits: dpFloor,
+    engineerNote: dpNote,
+    status: 'pending',
+    remainingQuantity: currentRemaining - qtyToAssign
   };
+
+  addDailyPlan(project.id, showCreateDaily.swpId, showCreateDaily.wpId, daily);
+
+  // ✅ Persist updated remaining quantity back to the weekly plan
+  updateWeeklyPlanField(project.id, showCreateDaily.swpId, showCreateDaily.wpId, {
+    remainingQuantity: currentRemaining - qtyToAssign,
+  });
+
+  // reset form
+  setDpDate(''); setDpQty(''); setDpConstraint(''); setDpFloor([]); setDpNote(''); setDpDay('1'); setDpUnits('');
+  setShowCreateDaily(null);
+};
 
   // Get the current six-week plan for the sub-week dialog
   const currentSwpForWeekly = showCreateWeekly ? project.sixWeekPlans.find(s => s.id === showCreateWeekly) : null;
@@ -204,7 +308,9 @@ const engineerTickets = tickets.filter(t => t.assignedTo === 'engineer');
 
   const allowedUnit = selectedWp?.unit || "";
 
-  const maxAllowedQty = Number(selectedWp?.estimatedQuantity || 0);
+  const maxAllowedQty = selectedWp
+  ? (selectedWp.remainingQuantity ?? selectedWp.estimatedQuantity)
+  : 0;
 
 
   const handleLogClick = (projectId, sixWeekPlanId, weeklyPlanId, dailyPlanId) => {
@@ -222,7 +328,13 @@ const engineerTickets = tickets.filter(t => t.assignedTo === 'engineer');
   setRovComment('');
 };
 
+const assignedQty =
+  currentSwpForWeekly?.weeklyPlans
+    ?.filter(wp => wp.id === selectedActivity?.id)
+    ?.reduce((sum, wp) => sum + Number(wp.estimatedQuantity || 0), 0) || 0;
 
+const remainingQty = (selectedActivity?.estimatedQuantity || 0) - assignedQty;
+console.log(selectedActivity)
   return (
     <div>
       <div className="flex items-center gap-2 mb-4">
@@ -270,6 +382,7 @@ const engineerTickets = tickets.filter(t => t.assignedTo === 'engineer');
                           <TableHead className="text-xs">Trade Activity</TableHead>
                           <TableHead className="text-xs">Unit</TableHead>
                           <TableHead className="text-xs">Est. Qty</TableHead>
+                          <TableHead className="text-xs">Rem. Qty</TableHead>
                           <TableHead className="text-xs">Floor</TableHead>
                           <TableHead className="text-xs w-20">Actions</TableHead>
                         </TableRow>
@@ -284,6 +397,7 @@ const engineerTickets = tickets.filter(t => t.assignedTo === 'engineer');
                             <TableCell className="text-xs">{act.tradeActivity}</TableCell>
                             <TableCell className="text-xs">{act.unit}</TableCell>
                             <TableCell className="text-xs">{act.estimatedQuantity}</TableCell>
+                            <TableCell className="text-xs">{act.remainingQuantity}</TableCell>
                             <TableCell className="text-xs"> {act.floorUnits?.length ? act.floorUnits.join(", ") : "—"}</TableCell>
                             <TableCell>
                               <div className="flex items-center gap-1">
@@ -539,6 +653,7 @@ const engineerTickets = tickets.filter(t => t.assignedTo === 'engineer');
                                 <TableHead className="text-xs font-semibold">Date</TableHead>
                                 <TableHead className="text-xs font-semibold">Planned Qty</TableHead>
                                 <TableHead className="text-xs font-semibold">Actual Qty</TableHead>
+                                <TableHead className="text-xs font-semibold">Remaining Qty</TableHead>
                                 <TableHead className="text-xs font-semibold">Floor</TableHead>
                                 <TableHead className="text-xs font-semibold">Constraint</TableHead>
                                 <TableHead className="text-xs font-semibold">ROV Comments</TableHead>
@@ -553,6 +668,7 @@ const engineerTickets = tickets.filter(t => t.assignedTo === 'engineer');
                                   <TableCell className="text-xs">{dp.date}</TableCell>
                                   <TableCell className="text-xs font-medium">{dp.plannedQuantity} {wp.unit}</TableCell>
                                   <TableCell className="text-xs">{dp.completedQuantity !== undefined ? `${dp.completedQuantity} ${wp.unit}` : '—'}</TableCell>
+                                  <TableHead className="text-xs font-semibold">{dp.remainingQuantity}</TableHead>
                                   <TableCell className="text-xs">{dp.floorUnits}</TableCell>
                                   <TableCell className="text-xs">{dp.constraint || '—'}</TableCell>
                                   <TableCell className="text-xs">{dp.supervisorNote || dp.engineerNote || '—'}</TableCell>
@@ -976,11 +1092,10 @@ const engineerTickets = tickets.filter(t => t.assignedTo === 'engineer');
                   <span className="text-muted-foreground">Trade:</span><span>{selectedActivity.trade}</span>
                   <span className="text-muted-foreground">Trade Activity:</span><span>{selectedActivity.tradeActivity}</span>
                   <span className="text-muted-foreground">Estimated Quantity:</span><span>{selectedActivity.estimatedQuantity}</span>
+                  <span className="text-muted-foreground">Remaining Quantity:</span><span>{selectedActivity.remainingQuantity}</span>
                   <span className="text-muted-foreground">Units:</span><span>{selectedActivity.unit}</span>
                   <span className="text-muted-foreground">Floor Unit:</span><span>{selectedActivity.floorUnits?.length ? selectedActivity.floorUnits.join(", ") : "—"}
                   </span>
-
-
                 </div>
               </div>
             )}
@@ -1003,22 +1118,25 @@ const engineerTickets = tickets.filter(t => t.assignedTo === 'engineer');
               </div>
               <div>
                 <Label>Est. Quantity</Label>
-                <Input
-                  type="number"
-                  value={wpEstQty}
-                  onChange={e => {
-                    const value = Number(e.target.value);
+             <Input
+  type="number"
+  value={wpEstQty}
+  onChange={e => {
+    const value = Number(e.target.value);
+    const limit = selectedActivity?.remainingQuantity ?? selectedActivity?.estimatedQuantity ?? 0;
 
-                    if (selectedActivity && value > selectedActivity.estimatedQuantity) {
-                      alert(`Max allowed quantity is ${selectedActivity.estimatedQuantity}`);
-                      return;
-                    }
+    if (value > limit) {
+      alert(`Max allowed quantity is ${limit}`);
+      return;
+    }
 
-                    setWpEstQty(e.target.value);
-                  }}
-                  placeholder="100"
-                  className="mt-1"
-                />
+    setWpEstQty(e.target.value);
+  }}
+  placeholder="100"
+  className="mt-1"
+  max={selectedActivity?.remainingQuantity ?? selectedActivity?.estimatedQuantity ?? undefined}
+  min={0}
+/>
               </div>
               <div>
                 <Label>Floor Units</Label>
@@ -1107,6 +1225,8 @@ const engineerTickets = tickets.filter(t => t.assignedTo === 'engineer');
 
                     <span className="text-muted-foreground">Estimated Quantity:</span>
                     <span>{selectedWp.estimatedQuantity}</span>
+                    <span className="text-muted-foreground">Remaining Quantity:</span>
+                    <span>{selectedWp.remainingQuantity}</span>
 
                     <span className="text-muted-foreground">Unit:</span>
                     <span>{selectedWp.unit}</span>
@@ -1138,33 +1258,60 @@ const engineerTickets = tickets.filter(t => t.assignedTo === 'engineer');
               </div>
             </div>
             <div className="grid grid-cols-2 gap-3">
-              <div>
-                <Label>Planned Quantity (units/day)</Label>
+             <div>
+  <Label>Planned Quantity (units/day)</Label>
 
-                <Input
-                  type="number"
-                  value={dpQty}
-                  onChange={(e) => {
-                    const value = Number(e.target.value);
+  <Input
+    type="number"
+    value={dpQty}
+    min={1}
+    max={maxAllowedQty}
+    onChange={(e) => {
+      const raw = e.target.value;
+      const value = Number(raw);
 
-                    if (value > maxAllowedQty) {
-                      alert(`Max allowed quantity is ${maxAllowedQty}`);
-                      return;
-                    }
+      // Allow clearing the field
+      if (raw === '') {
+        setDpQty('');
+        return;
+      }
 
-                    setDpQty(e.target.value);
-                  }}
-                  placeholder="e.g. 50"
-                  className="mt-1"
-                />
+      if (value <= 0) {
+        alert('Quantity must be greater than 0');
+        return;
+      }
 
-                {/* Inline error (better UX) */}
-                {dpQty > maxAllowedQty && (
-                  <p className="text-red-500 text-xs mt-1">
-                    Cannot exceed {maxAllowedQty}
-                  </p>
-                )}
-              </div>
+      if (value > maxAllowedQty) {
+        alert(`Max allowed quantity is ${maxAllowedQty}`);
+        return;
+      }
+
+      setDpQty(raw);
+    }}
+    placeholder="e.g. 50"
+    className="mt-1"
+  />
+
+  {/* Inline error — cast dpQty to number for correct comparison */}
+  {Number(dpQty) > maxAllowedQty && (
+    <p className="text-red-500 text-xs mt-1">
+      Cannot exceed {maxAllowedQty}
+    </p>
+  )}
+
+  {/* Show remaining hint below input */}
+  {maxAllowedQty > 0 && (
+    <p className="text-muted-foreground text-xs mt-1">
+      Remaining: {maxAllowedQty - (Number(dpQty) || 0)} {selectedWp?.unit}
+    </p>
+  )}
+
+  {maxAllowedQty === 0 && (
+    <p className="text-destructive text-xs mt-1 font-medium">
+      No remaining quantity available for this week plan.
+    </p>
+  )}
+</div>
 
               <div>
                 <Label className="text-xs">Unit</Label>

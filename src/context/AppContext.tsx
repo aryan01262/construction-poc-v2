@@ -21,6 +21,8 @@ interface AppContextType {
   logDailyTarget: (projectId: string, sixWeekPlanId: string, weeklyPlanId: string, dailyPlanId: string, completedQty: number, isDone: boolean, note: string) => void;
   submitDailyTarget: (projectId: string, sixWeekPlanId: string, weeklyPlanId: string, dailyPlanId: string, constraintLog: string) => void;
   confirmDailyTarget: (projectId: string, sixWeekPlanId: string, weeklyPlanId: string, dailyPlanId: string) => void;
+   updateActivity2: (projectId: string, sixWeekPlanId: string, activityId: string, patch: Partial<PlanActivity>) => void; // ✅ ADD
+   updateWeeklyPlanField: (projectId: string, sixWeekPlanId: string, weeklyPlanId: string, patch: Partial<WeeklyPlan>) => void;
 }
 
 const AppContext = createContext<AppContextType | null>(null);
@@ -68,6 +70,8 @@ useEffect(() => {
     } : p));
   }, []);
 
+
+
   const addWeeklyPlan = useCallback((projectId: string, sixWeekPlanId: string, wp: WeeklyPlan) => {
     setProjects(prev => prev.map(p => p.id === projectId ? {
       ...p, sixWeekPlans: p.sixWeekPlans.map(swp => swp.id === sixWeekPlanId ? { ...swp, weeklyPlans: [...swp.weeklyPlans, wp] } : swp)
@@ -81,6 +85,30 @@ useEffect(() => {
       } : swp)
     } : p));
   }, []);
+
+    const updateWeeklyPlanField = useCallback((
+  projectId: string,
+  sixWeekPlanId: string,
+  weeklyPlanId: string,
+  patch: Partial<WeeklyPlan>
+) => {
+  updateWeeklyPlan(projectId, sixWeekPlanId, weeklyPlanId, wp => ({ ...wp, ...patch }));
+}, [updateWeeklyPlan]);
+
+  const updateActivity2 = useCallback((
+  projectId: string,
+  sixWeekPlanId: string,
+  activityId: string,
+  patch: Partial<PlanActivity>
+) => {
+  setProjects(prev => prev.map(p => p.id !== projectId ? p : {
+    ...p,
+    sixWeekPlans: p.sixWeekPlans.map(swp => swp.id !== sixWeekPlanId ? swp : {
+      ...swp,
+      activities: swp.activities.map(a => a.id !== activityId ? a : { ...a, ...patch })
+    })
+  }));
+}, []);
 
   const assignToEngineer = useCallback((projectId: string, sixWeekPlanId: string, weeklyPlanId: string) => {
     updateWeeklyPlan(projectId, sixWeekPlanId, weeklyPlanId, wp => ({ ...wp, assignedToEngineer: true, status: 'assigned' }));
@@ -223,7 +251,7 @@ const logDailyTarget = useCallback((
       role, setRole, contractors, addContractor,
       projects, createProject, activeProjectId, setActiveProjectId,
       addSixWeekPlan, updateSixWeekPlanActivities, addWeeklyPlan, assignToEngineer,
-      addDailyPlan, forwardDailyToSupervisor, logDailyTarget, submitDailyTarget, confirmDailyTarget,tickets
+      addDailyPlan, forwardDailyToSupervisor, logDailyTarget, submitDailyTarget, confirmDailyTarget,tickets, updateActivity2,updateWeeklyPlanField
     }}>
       {children}
     </AppContext.Provider>

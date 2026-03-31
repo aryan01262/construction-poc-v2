@@ -24,6 +24,7 @@ export interface PlanActivity {
   unit: string;
   estimatedQuantity: number;
   floorUnits: string;
+  remainingQuantity: number;
 }
 
 export interface SixWeekPlan {
@@ -49,6 +50,7 @@ export interface DailyPlan {
   engineerNote?: string;
   // Supervisor fields
   completedQuantity?: number;
+  remainingQuantity? : number;
   isDone?: boolean;
   supervisorNote?: string;
   // Engineer validation
@@ -69,11 +71,13 @@ export interface WeeklyPlan {
   tradeActivity: string;
   unit: string;
   estimatedQuantity: number;
-  floorUnits: string;
+  floorUnits: [];
   constraint: string;
   status: 'pending' | 'assigned' | 'forwarded' | 'logged' | 'submitted' | 'validated' | 'confirmed';
   assignedToEngineer: boolean;
+  remainingQuantity : number;
   dailyPlans: DailyPlan[];
+  
 }
 
 // Dummy data for dropdowns
